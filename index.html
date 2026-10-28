@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gourmet Japan - Checklist Gastronómica</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter & Noto Serif JP -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Serif+JP:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        sakura: {
+                            50: '#fff5f7',
+                            100: '#ffe6ec',
+                            200: '#fccad6',
+                            500: '#f472b6',
+                            600: '#e11d48',
+                        },
+                        matcha: {
+                            50: '#f2f7f2',
+                            100: '#e1ede1',
+                            500: '#4a7c59',
+                            700: '#2d4a35',
+                        },
+                        washi: {
+                            50: '#faf8f5',
+                            100: '#f4efe6',
+                            200: '#e8decb',
+                            800: '#2c2825',
+                            900: '#1c1917',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['"Noto Serif JP"', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(225, 29, 72, 0.3);
+            border-radius: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(225, 29, 72, 0.6);
+        }
+        .japanese-bg {
+            background-color: #faf8f5;
+            background-image: radial-gradient(#e8decb 0.75px, transparent 0.75px);
+            background-size: 16px 16px;
+        }
+        .dark .japanese-bg {
+            background-color: #1c1917;
+            background-image: radial-gradient(#2c2825 0.75px, transparent 0.75px);
+            background-size: 16px 16px;
+        }
+    </style>
+</head>
+<body class="japanese-bg text-stone-800 dark:text-stone-100 font-sans min-h-full flex flex-col transition-colors duration-300">
+
+    <!-- Header / Navbar -->
+    <header class="sticky top-0 z-30 bg-white/80 dark:bg-stone-900/80 backdrop-blur-md border-b border-stone-200 dark:border-stone-800 transition-colors">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-full bg-sakura-100 dark:bg-stone-800 flex items-center justify-center text-sakura-600 text-xl font-serif font-bold shadow-sm border border-sakura-200 dark:border-stone-700">
+                        食
+                    </div>
+                    <div>
+                        <h1 class="text-lg font-bold font-serif text-stone-900 dark:text-stone-100 leading-tight">Gourmet Japan</h1>
+                        <p class="text-xs text-stone-500 dark:text-stone-400">Guía & Checklist Gastronómica</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center space-x-3">
+                    <!-- Progress summary badge -->
+                    <div class="hidden sm:flex items-center bg-sakura-50 dark:bg-stone-800 border border-sakura-200 dark:border-stone-700 rounded-full px-3 py-1">
+                        <i class="fa-solid fa-utensils text-sakura-600 text-xs mr-2"></i>
+                        <span id="global-progress-text" class="text-xs font-semibold text-stone-700 dark:text-stone-200">0/0 probados (0%)</span>
+                    </div>
+
+                    <!-- Dark Mode Toggle -->
+                    <button id="theme-toggle" class="p-2 rounded-full text-stone-500 hover:text-stone-800 dark:text-stone-400 dark:hover:text-stone-100 bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700 transition">
+                        <i class="fa-solid fa-moon dark:hidden"></i>
+                        <i class="fa-solid fa-sun hidden dark:block"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Global Progress Bar -->
+            <div class="mt-3 w-full bg-stone-200 dark:bg-stone-800 h-1.5 rounded-full overflow-hidden">
+                <div id="global-progress-bar" class="bg-gradient-to-r from-sakura-500 to-sakura-600 h-full w-0 transition-all duration-500"></div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col gap-6">
+
+        <!-- Controls Section: Search & Tabs -->
+        <section class="space-y-4">
+            <!-- Search Bar & Filters -->
+            <div class="flex flex-col md:flex-row gap-3 items-center justify-between">
+                <div class="relative w-full md:w-96">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 text-sm"></i>
+                    <input type="text" id="search-input" placeholder="Buscar por plato, ingrediente o kanji..." 
+                           class="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sakura-500 dark:text-stone-100 placeholder-stone-400 shadow-sm transition">
+                </div>
+
+                <div class="flex items-center space-x-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0 custom-scrollbar">
+                    <button id="btn-filter-all" onclick="setFilterStatus('all')" class="filter-status-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-stone-800 text-white dark:bg-stone-100 dark:text-stone-900 shadow-sm transition">
+                        Todos
+                    </button>
+                    <button id="btn-filter-pending" onclick="setFilterStatus('pending')" class="filter-status-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-white dark:bg-stone-800 text-stone-600 dark:text-stone-300 border border-stone-200 dark:border-stone-700 hover:bg-stone-50 dark:hover:bg-stone-700 transition">
+                        Por Probar
+                    </button>
+                    <button id="btn-filter-completed" onclick="setFilterStatus('completed')" class="filter-status-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-white dark:bg-stone-800 text-stone-600 dark:text-stone-300 border border-stone-200 dark:border-stone-700 hover:bg-stone-50 dark:hover:bg-stone-700 transition">
+                        Probados
+                    </button>
+                    <button onclick="resetProgress()" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-red-50 text-red-600 dark:bg-red-950/40 dark:text-red-400 border border-red-200 dark:border-red-900/50 hover:bg-red-100 transition ml-auto whitespace-nowrap">
+                        <i class="fa-solid fa-rotate-right mr-1"></i> Reiniciar
+                    </button>
+                </div>
+            </div>
+
+            <!-- Region Tabs -->
+            <div class="flex items-center gap-2 overflow-x-auto pb-2 custom-scrollbar border-b border-stone-200 dark:border-stone-800">
+                <button onclick="selectCategory('all')" data-cat="all" class="category-tab active px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition flex items-center gap-2 bg-sakura-600 text-white shadow-sm">
+                    <i class="fa-solid fa-earth-asia"></i> Todo Japón
+                </button>
+                <button onclick="selectCategory('tokyo')" data-cat="tokyo" class="category-tab px-4 py-2 rounded-xl text-xs sm:text-sm font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 whitespace-nowrap transition flex items-center gap-2">
+                    <i class="fa-solid fa-city"></i> Tokio
+                </button>
+                <button onclick="selectCategory('kyoto')" data-cat="kyoto" class="category-tab px-4 py-2 rounded-xl text-xs sm:text-sm font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 whitespace-nowrap transition flex items-center gap-2">
+                    <i class="fa-solid fa-torii-gate"></i> Kioto
+                </button>
+                <button onclick="selectCategory('osaka')" data-cat="osaka" class="category-tab px-4 py-2 rounded-xl text-xs sm:text-sm font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 whitespace-nowrap transition flex items-center gap-2">
+                    <i class="fa-solid fa-fire"></i> Osaka
+                </button>
+                <button onclick="selectCategory('nara')" data-cat="nara" class="category-tab px-4 py-2 rounded-xl text-xs sm:text-sm font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 whitespace-nowrap transition flex items-center gap-2">
+                    <i class="fa-solid fa-tree"></i> Nara
+                </button>
+                <button onclick="selectCategory('excursions')" data-cat="excursions" class="category-tab px-4 py-2 rounded-xl text-xs sm:text-sm font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 whitespace-nowrap transition flex items-center gap-2">
+                    <i class="fa-solid fa-mountain"></i> Nikko / Kamakura / Fuji
+                </button>
+                <button onclick="selectCategory('combini')" data-cat="combini" class="category-tab px-4 py-2 rounded-xl text-xs sm:text-sm font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 whitespace-nowrap transition flex items-center gap-2">
+                    <i class="fa-solid fa-store"></i> Combini & Básicos
+                </button>
+            </div>
+        </section>
+
+        <!-- Category Banner & Stats -->
+        <div id="category-header" class="bg-white dark:bg-stone-800 rounded-2xl p-5 border border-stone-200 dark:border-stone-700 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+                <h2 id="category-title" class="text-xl font-bold font-serif text-stone-900 dark:text-stone-100">Todo Japón</h2>
+                <p id="category-desc" class="text-xs text-stone-500 dark:text-stone-400 mt-1">Explora las delicias más icónicas de la gastronomía japonesa.</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <div class="text-right">
+                    <span id="category-progress-text" class="text-sm font-bold text-stone-800 dark:text-stone-200">0 de 0 completados</span>
+                    <div class="w-32 bg-stone-100 dark:bg-stone-700 h-2 rounded-full overflow-hidden mt-1">
+                        <div id="category-progress-bar" class="bg-matcha-500 h-full w-0 transition-all duration-300"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Food Cards Grid -->
+        <section id="food-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            <!-- Dynamic Food Cards Inject Here -->
+        </section>
+
+        <!-- Empty State -->
+        <div id="empty-state" class="hidden flex-col items-center justify-center py-16 text-center">
+            <div class="w-16 h-16 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center text-stone-400 text-2xl mb-3">
+                <i class="fa-solid fa-bowl-rice"></i>
+            </div>
+            <h3 class="text-base font-semibold text-stone-700 dark:text-stone-300">No se encontraron platillos</h3>
+            <p class="text-xs text-stone-500 dark:text-stone-400 max-w-xs mt-1">Prueba con otro término de búsqueda o cambia los filtros de estado.</p>
+        </div>
+    </main>
+
+    <!-- Detail Modal -->
+    <div id="dish-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity">
+        <div class="bg-white dark:bg-stone-900 rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl border border-stone-200 dark:border-stone-800 animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">
+            
+            <!-- Modal Image Header -->
+            <div class="relative h-48 sm:h-56 w-full bg-stone-100 dark:bg-stone-800 shrink-0">
+                <img id="modal-img" src="" alt="Foto de comida" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=600&q=80';">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
+                <button onclick="closeModal()" class="absolute top-3 right-3 text-white/90 hover:text-white bg-black/40 p-2 rounded-full hover:bg-black/60 transition backdrop-blur-sm">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+                <div class="absolute bottom-3 left-4 right-4 flex items-end justify-between">
+                    <div class="flex items-center space-x-2">
+                        <span id="modal-emoji" class="text-2xl p-1.5 bg-white/90 dark:bg-stone-800/90 rounded-lg backdrop-blur-sm">🍜</span>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <h3 id="modal-title" class="text-lg font-bold font-serif text-white drop-shadow">Nombre del Plato</h3>
+                                <span id="modal-kanji" class="text-xs px-2 py-0.5 rounded bg-white/20 text-white backdrop-blur-sm font-serif">漢字</span>
+                            </div>
+                            <p id="modal-romaji" class="text-xs text-sakura-200 font-medium">Romaji Name</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Content (Scrollable) -->
+            <div class="modal-body-container p-5 overflow-y-auto space-y-4 text-sm custom-scrollbar">
+                
+                <!-- Badges -->
+                <div class="flex items-center gap-2">
+                    <span id="modal-region" class="px-2.5 py-1 rounded-md text-xs font-semibold bg-sakura-50 text-sakura-700 dark:bg-sakura-950/40 dark:text-sakura-300 border border-sakura-200 dark:border-sakura-900/50">
+                        Región
+                    </span>
+                    <span id="modal-budget" class="px-2.5 py-1 rounded-md text-xs font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/50">
+                        Presupuesto
+                    </span>
+                </div>
+
+                <!-- Description -->
+                <div>
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-stone-400 mb-1">Descripción</h4>
+                    <p id="modal-desc" class="text-stone-700 dark:text-stone-300 leading-relaxed text-xs sm:text-sm">
+                        Descripción detallada del platillo.
+                    </p>
+                </div>
+
+                <!-- Where to eat -->
+                <div class="p-3 bg-stone-50 dark:bg-stone-800/60 rounded-xl border border-stone-200/60 dark:border-stone-700/60">
+                    <h4 class="text-xs font-bold text-stone-800 dark:text-stone-200 flex items-center gap-2 mb-1">
+                        <i class="fa-solid fa-location-dot text-sakura-600"></i> ¿Dónde probarlo?
+                    </h4>
+                    <p id="modal-spot" class="text-xs text-stone-600 dark:text-stone-400">
+                        Recomendación del lugar.
+                    </p>
+                </div>
+
+                <!-- Ordering Phrase Box -->
+                <div class="p-4 bg-stone-900 text-stone-100 rounded-xl shadow-inner space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs text-stone-400 font-mono uppercase tracking-wider"><i class="fa-regular fa-comments mr-1"></i> Para Pedir en el Restaurante</span>
+                        <button onclick="copyOrderingPhrase()" class="text-xs text-sakura-400 hover:text-sakura-300 flex items-center gap-1 transition">
+                            <i class="fa-regular fa-copy"></i> <span id="copy-btn-text">Copiar</span>
+                        </button>
+                    </div>
+                    <div class="border-t border-stone-800 pt-2">
+                        <p id="modal-phrase-jp" class="text-base font-serif text-amber-300">これをお願いします</p>
+                        <p id="modal-phrase-romaji" class="text-xs text-stone-300 italic mt-0.5">"Kore o onegaishimasu"</p>
+                        <p id="modal-phrase-es" class="text-xs text-stone-400 mt-1">Traducción: "Por favor, deme esto."</p>
+                    </div>
+                </div>
+
+                <!-- External Google Search Button -->
+                <div class="pt-1">
+                    <a id="modal-google-link" href="#" target="_blank" rel="noopener" class="w-full py-2 bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-200 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition border border-stone-200 dark:border-stone-700">
+                        <i class="fa-solid fa-image text-sakura-600"></i> Buscar más fotos en Google Imágenes ↗
+                    </a>
+                </div>
+
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="p-4 border-t border-stone-100 dark:border-stone-800 bg-stone-50 dark:bg-stone-800/50 flex justify-between items-center">
+                <button id="modal-check-btn" onclick="toggleModalCheck()" class="w-full py-2.5 rounded-xl font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition shadow-sm">
+                    <!-- Dynamic state injected -->
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none bg-stone-900 text-white px-4 py-3 rounded-xl shadow-xl flex items-center space-x-3 border border-stone-800 text-xs sm:text-sm">
+        <i id="toast-icon" class="fa-solid fa-circle-check text-emerald-400"></i>
+        <span id="toast-message">Mensaje de notificación</span>
+    </div>
+
+    <!-- Data & Script Logic -->
+    <script>
+        // Database of Dishes
+        const FOOD_DATA = [
+            // KYOTO
+            {
+                id: 'obanzai',
+                category: 'kyoto',
+                name: 'Obanzai',
+                kanji: 'おばんざい',
+                romaji: 'Obanzai',
+                emoji: '🍱',
+                img: 'https://images.unsplash.com/photo-1580822184713-fc5400e7fe10?auto=format&fit=crop&w=600&q=80',
+                regionName: 'Kioto',
+                budget: '€€ (Moderado)',
+                desc: 'Cocina casera tradicional de Kioto en pequeñas porciones. Utiliza verduras locales de temporada, tofu y encurtidos.',
+                spot: 'Mercado Nishiki o restaurantes tradicionales en Gion.',
+                phraseJp: 'おばんざいランチをお願いします。',
+                phraseRomaji: 'Obanzai ranchi o onegaishimasu.',
+                phraseEs: 'Un menú del día Obanzai, por favor.'
+            },
+            {
+                id: 'yudofu',
+                category: 'kyoto',
+                name: 'Yudofu',
+                kanji: '湯豆腐',
+                romaji: 'Yudōfu',
+                emoji: '🍲',
+                img: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80',
+                regionName: 'Kioto',
+                budget: '€€ (Moderado)',
+                desc: 'Bloques de tofu fresco hervidos suavemente en caldo de alga kombu. Un plato vegetariano minimalista pero lleno de sabor.',
+                spot: 'Restaurantes de Arashiyama cerca del bosque de bambú.',
+                phraseJp: '湯豆腐コースを一人前お願いします。',
+                phraseRomaji: 'Yudōfu kōsu o hitorimae onegaishimasu.',
+                phraseEs: 'Un menú de Yudofu para una persona, por favor.'
+            },
+            {
+                id: 'matcha-soft',
+                category: 'kyoto',
+                name: 'Helado de Matcha',
+                kanji: '抹茶ソフト',
+                romaji: 'Matcha Sofuto',
+                emoji: '🍦',
+                img: 'https://images.unsplash.com/photo-1505394033641-40c6ad1178d7?auto=format&fit=crop&w=600&q=80',
+                regionName: 'Kioto',
+                budget: '€ (Económico ~400¥)',
+                desc: 'Cremoso helado elaborado con té verde en polvo de máxima calidad, muy típico de Uji y Kioto.',
+                spot: 'Tiendas especializadas en Uji o zona Higashiyama.',
+                phraseJp: '抹茶ソフトクリームをひとつください。',
+                phraseRomaji: 'Matcha soft-kurīmu o hitotsu kudasai.',
+                phraseEs: 'Un helado de matcha, por favor.'
+            },
+
+            // OSAKA
+            {
+                id: 'takoyaki',
+                category: 'osaka',
+                name: 'Takoyaki',
+                kanji: 'たこ焼き',
+                romaji: 'Takoyaki',
+                emoji: '🧆',
+                img: 'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=600&q=80',
+                regionName: 'Osaka',
+                budget: '€ (Económico ~600¥)',
+                desc: 'Bolitas de masa de harina rellenas de trozos de pulpo, cocinadas en planchas especiales con salsa dulce, mayonesa y katsuobushi.',
+                spot: 'Puestos callejeros de Dotonbori (ej. Wanaka o Kukuru).',
+                phraseJp: 'たこ焼きを八個お願いします。',
+                phraseRomaji: 'Takoyaki o hakko onegaishimasu.',
+                phraseEs: '8 unidades de Takoyaki, por favor.'
+            },
+            {
+                id: 'okonomiyaki',
+                category: 'osaka',
+                name: 'Okonomiyaki',
+                kanji: 'お好み焼き',
+                romaji: 'Okonomiyaki',
+                emoji: '🥞',
+                img: 'https://images.unsplash.com/photo-1541544741938-0af808871cc0?auto=format&fit=crop&w=600&q=80',
+                regionName: 'Osaka',
+                budget: '€ (Económico ~1000¥)',
+                desc: 'Conocida como la "pizza o tortilla japonesa". Masa a base de repollo, huevo y carne o marisco, dorada en plancha de hierro.',
+                spot: 'Mizuno o Chibo en Dotonbori.',
+                phraseJp: '豚玉（ぶただま）をお願いします。',
+                phraseRomaji: 'Butatama o onegaishimasu.',
+                phraseEs: 'Un Okonomiyaki de cerdo (Butatama), por favor.'
+            },
+            {
+                id: 'kushikatsu',
+                category: 'osaka',
+                name: 'Kushikatsu',
+                kanji: '串カツ',
+                romaji: 'Kushikatsu',
+                emoji: '🍢',
+                img: 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=600&q=80',
+                regionName: 'Osaka',
+                budget: '€ (Económico ~1500¥)',
+                desc: 'Brochetas variadas de carne, verdura o queso empanadas con panko fino y fritas super crujientes.',
+                spot: 'Daruma en el barrio de Shinsekai.',
+                phraseJp: 'おまかせ盛り合わせをお願いします。',
+                phraseRomaji: 'Omakase moriawase o onegaishimasu.',
+                phraseEs: 'Un variado de brochetas recomendado por el chef, por favor.'
+            },
+            {
+                id: 'kitsune-udon',
+                category: 'osaka',
+                name: 'Kitsune Udon',
+                kanji: 'きつねうどん',
+                romaji: 'Kitsune Udon',
+                emoji: '🍜',
+                img: 'https://images.unsplash.com/photo-1618841557871-b4664fbf0cb3?auto=format&fit=crop&w=600&q=80',
+                regionName: 'Osaka',
+                budget: '€ (Económico ~700¥)',
+                desc: 'Fideos udon en un caldo suave dashi, coronados con un pedazo de tofu frito dulce (aburaage).',
+                spot: 'Usami-tei Matsubaya (donde se inventó el plato en Osaka).',
+                phraseJp: 'きつねうどんをひとつお願いします。',
+                phraseRomaji: 'Kitsune udon o hitotsu onegaishimasu.',
+                phraseEs: 'Un Kitsune Udon, por favor.'
+            },
+
+            // NARA
+            {
+                id: 'kakinoha-zushi',
+                category: 'nara',
+                name: 'Kakinoha-zushi',
+                kanji: '柿の葉寿司',
+                romaji: 'Kakinoha-zushi',
+                emoji: '🍃',
+                img: 'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?auto=format&fit=crop&w=600&q=80',
+                regionName: 'Nara',
+                budget: '€ (Económico ~1200¥)',
+                desc: 'Sushi curado de salmón o caballa prensado y envuelto individualmente en hojas de caqui.',
+                spot: 'Tiendas cerca de la estación JR Nara o el Parque de Nara.',
+                phraseJp: '柿の葉寿司の詰め合わせをください。',
+                phraseRomaji: 'Kakinoha-zushi no tsumeawase o kudasai.',
+                phraseEs: 'Caja variada de Kakinoha-zushi, por favor.'
+            },
+
+            // TOKYO
+            {
+                id: 'shoyu-ramen',
+                category: 'tokyo',
+                name: 'Shoyu Ramen',
+                kanji: '醤油ラーメン',
+                romaji: 'Shōyu Ramen',
+                emoji: '🍜',
+                img: 'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=600&q=80',
+                regionName: 'Tokio',
+                budget: '€ (Económico ~1000¥)',
+                desc: 'Ramen clásico estilo Tokio con caldo transparente a base de salsa de soja, carne de cerdo (chashu) y huevo blando.',
+                spot: 'Ramen Street en la Estación de Tokio o zonas como Shinjuku/Shibuya.',
+                phraseJp: '醤油ラーメン、味玉トッピングで。',
+                phraseRomaji: 'Shōyu rāmen, ajitama toppingu de.',
+                phraseEs: 'Shoyu Ramen con extra de huevo hervido, por favor.'
+            },
+            {
+                id: 'monjayaki',
+                category: 'tokyo',
+                name: 'Monjayaki',
+                kanji: '文字焼き',
+                romaji: 'Monjayaki',
+                emoji: '🥘',
+                img: 'https://images.unsplash.com/photo-1555126634-323283e090fa?auto=format&fit=crop&w=600&q=80',
+                regionName: 'Tokio',
+                budget: '€€ (Moderado ~1500¥)',
+                desc: 'Especialidad de Tokio similar al okonomiyaki pero con una masa mucho más fluida. Se come raspando la plancha con espátulas.',
+                spot: 'Calle Monja Street en Tsukishima.',
+                phraseJp: '明太子もちチーズもんじゃをお願いします。',
+                phraseRomaji: 'Mentaiko mochi chīzu monja o onegaishimasu.',
+                phraseEs: 'Monjayaki de huevas, mochi y queso, por favor.'
+            },
+            {
+                id: 'katsu-curry',
+                category: 'tokyo',
+                name: 'Katsu Curry',
+                kanji: 'カツカレー',
+                romaji: 'Katsu Karē',
+                emoji: '🍛',
+                img: 'https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?auto=format&fit=crop&w=600&q=80',
+                regionName: 'Tokio',
+                budget: '€ (Económico ~900¥)',
+                desc: 'Filete de cerdo crujiente empanado sobre arroz y bañado en una rica salsa de curry japonés.',
+                spot: 'Cadenas espectaculares como CoCo Ichibanya o Go! Go! Curry.',
+                phraseJp: 'ロースカツカレー、辛さは普通で。',
+                phraseRomaji: 'Rōsu katsu karē, karasa wa futsū de.',
+                phraseEs: 'Katsu Curry de cerdo con picante normal, por favor.'
+            },
+            {
+                id: 'market-sushi',
+                category: 'tokyo',
+                name: 'Sushi de Mercado',
+                kanji: '握り寿司',
+                romaji: 'Nigiri Sushi',
+                emoji: '🍣',
+                img: 'https://images.unsplash.com/photo-1611143669185-af224c5e3252?auto=format&fit=crop&w=600&q=80',
+                regionName: 'Tokio',
+                budget: '€€€ (Premium ~3000-5000¥)',
+                desc: 'Nigiris elaborados con el pescado corte fresco del día directamente desde la lonja.',
+                spot: 'Mercado Exterior de Tsukiji o Mercado de Toyosu.',
+                phraseJp: 'おまかせ握りセットをお願いします。',
+                phraseRomaji: 'Omakase nigiri setto o onegaishimasu.',
+                phraseEs: 'Set de nigiris surtidos del chef, por favor.'
+            },
+
+            // EXCURSIONS (NIKKO, KAMAKURA, FUJI)
+            {
+                id: 'yuba-manju',
+                category: 'excursions',
+                name: 'Yuba Age-Manju',
+                kanji: 'ゆばあげまんじゅう',
+                romaji: 'Yuba Age-Manju',
+                emoji: '🥠',
+                img: 'https://images.unsplash.com/photo-1563805042-7684c019e1cb?auto=format&fit=crop&w=600&q=80',
+                regionName: 'Nikko',
+                budget: '€ (Económico ~250¥)',
+                desc: 'Pastelito crujiente frito hecho de piel de soja (yuba) relleno de judía roja dulce y con un toque de sal marina.',
+                spot: 'Sakaeya, justo en la salida de la estación Tobu-Nikko.',
+                phraseJp: '揚げゆばまんじゅうをひとつください。',
+                phraseRomaji: 'Age yuba manjū o hitotsu kudasai.',
+                phraseEs: 'Un Yuba Age-Manju frito, por favor.'
+            },
+            {
+                id: 'tako-senbei',
+                category: 'excursions',
+                name: 'Tako Senbei',
+                kanji: 'たこせんべい',
+                romaji: 'Tako Senbei',
+                emoji: '🐙',
+                img: 'https://images.unsplash.com/photo-1599488615731-7e5c2823ff28?auto=format&fit=crop&w=600&q=80',
+                regionName: 'Kamakura / Enoshima',
+                budget: '€ (Económico ~500¥)',
+                desc: 'Galleta gigante súper fina creada prensando pulpos enteros frescos en una plancha caliente de alta presión.',
+                spot: 'Isla de Enoshima (Tienda Asahi Ya).',
+                phraseJp: 'たこせんべいを食券で買いました。',
+                phraseRomaji: 'Tako senbei o shokken de kaimashita.',
+                phraseEs: 'Aquí tengo el ticket para el Tako Senbei.'
+            },
+            {
+                id: 'hoto-noodles',
+                category: 'excursions',
+                name: 'Hoto Noodles',
+                kanji: 'ほうとう',
+                romaji: 'Hōtō',
+                emoji: '🍲',
+                img: 'https://images.unsplash.com/photo-1618841557871-b4664fbf0cb3?auto=format&fit=crop&w=600&q=80',
+                regionName: 'Fuji / Kawaguchiko',
+                budget: '€€ (Moderado ~1400¥)',
+                desc: 'Fideos anchos tipo tallarín cocinados a fuego lento en sopa de miso reconfortante con calabaza (kabocha) y verduras.',
+                spot: 'Houtou Fudou (frente a la estación Kawaguchiko).',
+                phraseJp: '名物ほうとうをひとつお願いします。',
+                phraseRomaji: 'Meibutsu hōtō o hitotsu onegaishimasu.',
+                phraseEs: 'Un cuenco de Hoto tradicional, por favor.'
+            },
+
+            // COMBINI & CLASSICS
+            {
+                id: 'onigiri-combini',
+                category: 'combini',
+                name: 'Onigiri de Combini',
+                kanji: 'おにぎり',
+                romaji: 'Onigiri',
+                emoji: '🍙',
+                img: 'https://images.unsplash.com/photo-1615870216519-2f9fa575fa5c?auto=format&fit=crop&w=600&q=80',
+                regionName: 'Combini (7-Eleven / Lawson)',
+                budget: '€ (Económico ~150¥)',
+                desc: 'Triángulo de arroz perfecto envuelto en alga crujiente. El de atún con mayonesa (Tuna Mayo) es un salvavidas diario.',
+                spot: '7-Eleven, Lawson o FamilyMart.',
+                phraseJp: 'ツナマヨおにぎりはどこですか？',
+                phraseRomaji: 'Tuna mayo onigiri wa doko desu ka?',
+                phraseEs: '¿Dónde están los onigiris de atún con mayonesa?'
+            },
+            {
+                id: 'tonkatsu',
+                category: 'combini',
+                name: 'Tonkatsu',
+                kanji: '豚カツ',
+                romaji: 'Tonkatsu',
+                emoji: '🥩',
+                img: 'https://images.unsplash.com/photo-1591814468924-caf88d1232e1?auto=format&fit=crop&w=600&q=80',
+                regionName: 'Japón (General)',
+                budget: '€€ (Moderado ~1200¥)',
+                desc: 'Chuleta de cerdo gruesa jugosa y empanada con panko ultra crujiente, servida con col rallada y sopa miso.',
+                spot: 'Cadenas como Maisen o Katsukura.',
+                phraseJp: 'ロースカツ定食をお願いします。',
+                phraseRomaji: 'Rōsu katsu teishoku o onegaishimasu.',
+                phraseEs: 'Menú completo de chuleta de cerdo (Rosu Katsu), por favor.'
+            },
+            {
+                id: 'yakitori',
+                category: 'combini',
+                name: 'Yakitori',
+                kanji: '焼き鳥',
+                romaji: 'Yakitori',
+                emoji: '🍢',
+                img: 'https://images.unsplash.com/photo-1528825871115-3581a5387919?auto=format&fit=crop&w=600&q=80',
+                regionName: 'Japón (Izakaya)',
+                budget: '€ (Económico ~200¥/brocheta)',
+                desc: 'Brochetas de pollo asadas a la parrilla sobre carbón, sazonadas con sal (Shio) o salsa dulce (Tare).',
+                spot: 'Izakayas (tabernas) en Omoide Yokocho o Dotonbori.',
+                phraseJp: 'ねぎまを塩でふたつお願いします。',
+                phraseRomaji: 'Negima o shio de futatsu onegaishimasu.',
+                phraseEs: 'Dos brochetas de pollo y cebollino con sal, por favor.'
+            }
+        ];
+
+        // App State
+        let currentCategory = 'all';
+        let currentFilterStatus = 'all'; 
+        let searchQuery = '';
+        let checkedDishes = JSON.parse(localStorage.getItem('japan_eaten_dishes') || '[]');
+        let activeModalDishId = null;
+
+        // Category Metadata
+        const CATEGORY_META = {
+            all: { title: 'Todo Japón', desc: 'Explora las delicias más icónicas de la gastronomía japonesa.' },
+            tokyo: { title: 'Tokio (東京)', desc: 'Desde ramen en callejones hasta sushi fresco en los mercados.' },
+            kyoto: { title: 'Kioto (京都)', desc: 'Tradición Zen, alta cocina con tofu, matcha y pequeñas delicias Obanzai.' },
+            osaka: { title: 'Osaka (大阪)', desc: 'La capital de la comida callejera y de la plancha (Takoyaki, Okonomiyaki).' },
+            nara: { title: 'Nara (奈良)', desc: 'Sabores históricos y el tradicional sushi envuelto en hojas de caqui.' },
+            excursions: { title: 'Excursiones (Nikko, Kamakura, Fuji)', desc: 'Especialidades locales únicas para tus escapadas de un día.' },
+            combini: { title: 'Combini & Clásicos', desc: 'Snacks imprescindibles de 7-Eleven y platos confort de todo Japón.' }
+        };
+
+        // DOM Elements
+        const foodGrid = document.getElementById('food-grid');
+        const emptyState = document.getElementById('empty-state');
+        const searchInput = document.getElementById('search-input');
+        const dishModal = document.getElementById('dish-modal');
+
+        // Initial Load
+        window.addEventListener('DOMContentLoaded', () => {
+            initTheme();
+            render();
+        });
+
+        // Theme Support
+        function initTheme() {
+            if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+
+            document.getElementById('theme-toggle').addEventListener('click', () => {
+                document.documentElement.classList.toggle('dark');
+                if (document.documentElement.classList.contains('dark')) {
+                    localStorage.theme = 'dark';
+                } else {
+                    localStorage.theme = 'light';
+                }
+            });
+        }
+
+        // Search Listener
+        searchInput.addEventListener('input', (e) => {
+            searchQuery = e.target.value.toLowerCase().trim();
+            render();
+        });
+
+        // Filter / Navigation Logic
+        function selectCategory(cat) {
+            currentCategory = cat;
+            document.querySelectorAll('.category-tab').forEach(tab => {
+                if (tab.dataset.cat === cat) {
+                    tab.classList.add('bg-sakura-600', 'text-white', 'shadow-sm', 'active');
+                    tab.classList.remove('text-stone-600', 'dark:text-stone-300', 'hover:bg-stone-100', 'dark:hover:bg-stone-800');
+                } else {
+                    tab.classList.remove('bg-sakura-600', 'text-white', 'shadow-sm', 'active');
+                    tab.classList.add('text-stone-600', 'dark:text-stone-300', 'hover:bg-stone-100', 'dark:hover:bg-stone-800');
+                }
+            });
+            render();
+        }
+
+        function setFilterStatus(status) {
+            currentFilterStatus = status;
+            document.querySelectorAll('.filter-status-btn').forEach(btn => {
+                btn.classList.remove('bg-stone-800', 'text-white', 'dark:bg-stone-100', 'dark:text-stone-900');
+                btn.classList.add('bg-white', 'dark:bg-stone-800', 'text-stone-600', 'dark:text-stone-300');
+            });
+
+            const activeBtn = document.getElementById(`btn-filter-${status}`);
+            if (activeBtn) {
+                activeBtn.classList.remove('bg-white', 'dark:bg-stone-800', 'text-stone-600', 'dark:text-stone-300');
+                activeBtn.classList.add('bg-stone-800', 'text-white', 'dark:bg-stone-100', 'dark:text-stone-900');
+            }
+            render();
+        }
+
+        // Toggle Item Check State
+        function toggleCheck(dishId, event) {
+            if (event) event.stopPropagation();
+
+            const index = checkedDishes.indexOf(dishId);
+            if (index > -1) {
+                checkedDishes.splice(index, 1);
+                showToast('Marcado como no probado', 'info');
+            } else {
+                checkedDishes.push(dishId);
+                showToast('¡Plato marcado como probado! 🥢', 'success');
+            }
+
+            localStorage.setItem('japan_eaten_dishes', JSON.stringify(checkedDishes));
+            render();
+
+            if (activeModalDishId === dishId) {
+                updateModalCheckButton();
+            }
+        }
+
+        function resetProgress() {
+            if (confirm('¿Quieres reiniciar todas las casillas y borrar el progreso de probados?')) {
+                checkedDishes = [];
+                localStorage.removeItem('japan_eaten_dishes');
+                render();
+                showToast('Progreso reiniciado', 'info');
+            }
+        }
+
+        // Render Cards & UI State
+        function render() {
+            const meta = CATEGORY_META[currentCategory];
+            document.getElementById('category-title').innerText = meta.title;
+            document.getElementById('category-desc').innerText = meta.desc;
+
+            const filtered = FOOD_DATA.filter(dish => {
+                const matchesCategory = (currentCategory === 'all') || (dish.category === currentCategory);
+                const isChecked = checkedDishes.includes(dish.id);
+                
+                let matchesStatus = true;
+                if (currentFilterStatus === 'pending') matchesStatus = !isChecked;
+                if (currentFilterStatus === 'completed') matchesStatus = isChecked;
+
+                const matchesSearch = dish.name.toLowerCase().includes(searchQuery) || 
+                                      dish.kanji.includes(searchQuery) || 
+                                      dish.romaji.toLowerCase().includes(searchQuery) ||
+                                      dish.desc.toLowerCase().includes(searchQuery) ||
+                                      dish.regionName.toLowerCase().includes(searchQuery);
+
+                return matchesCategory && matchesStatus && matchesSearch;
+            });
+
+            updateProgressStats();
+
+            foodGrid.innerHTML = '';
+            if (filtered.length === 0) {
+                emptyState.classList.remove('hidden');
+                emptyState.classList.add('flex');
+            } else {
+                emptyState.classList.add('hidden');
+                emptyState.classList.remove('flex');
+
+                filtered.forEach(dish => {
+                    const isChecked = checkedDishes.includes(dish.id);
+                    const card = document.createElement('div');
+                    card.className = `group bg-white dark:bg-stone-800/90 rounded-2xl p-4 border ${isChecked ? 'border-emerald-300 dark:border-emerald-800/80 bg-emerald-50/20 dark:bg-emerald-950/10' : 'border-stone-200 dark:border-stone-700/70'} shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer flex flex-col justify-between`;
+                    card.onclick = () => openModal(dish.id);
+
+                    card.innerHTML = `
+                        <div>
+                            <div class="flex items-start justify-between gap-3 mb-2">
+                                <div class="flex items-center space-x-3">
+                                    <div class="text-2xl p-2 bg-stone-50 dark:bg-stone-700/50 rounded-xl group-hover:scale-110 transition-transform">
+                                        ${dish.emoji}
+                                    </div>
+                                    <div>
+                                        <div class="flex items-center gap-1.5">
+                                            <h3 class="font-bold text-stone-900 dark:text-stone-100 text-sm sm:text-base leading-snug">${dish.name}</h3>
+                                            <span class="text-xs font-serif text-stone-400 font-normal">${dish.kanji}</span>
+                                        </div>
+                                        <p class="text-xs text-sakura-600 dark:text-sakura-400 font-medium">${dish.romaji}</p>
+                                    </div>
+                                </div>
+
+                                <button onclick="toggleCheck('${dish.id}', event)" class="p-2 rounded-xl transition ${isChecked ? 'text-emerald-500 bg-emerald-100 dark:bg-emerald-950/60' : 'text-stone-300 hover:text-stone-400 dark:text-stone-600'}">
+                                    <i class="${isChecked ? 'fa-solid fa-circle-check text-xl' : 'fa-regular fa-circle text-xl'}"></i>
+                                </button>
+                            </div>
+
+                            <p class="text-xs text-stone-600 dark:text-stone-400 line-clamp-2 mt-2 leading-relaxed">
+                                ${dish.desc}
+                            </p>
+                        </div>
+
+                        <div class="mt-4 pt-3 border-t border-stone-100 dark:border-stone-700/50 flex items-center justify-between text-[11px]">
+                            <span class="px-2 py-0.5 rounded bg-stone-100 dark:bg-stone-700 text-stone-600 dark:text-stone-300 font-medium">
+                                <i class="fa-solid fa-location-dot text-sakura-600 mr-1"></i>${dish.regionName}
+                            </span>
+                            <span class="text-stone-400 dark:text-stone-500 group-hover:text-sakura-600 transition flex items-center gap-1">
+                                Ver frase y detalles <i class="fa-solid fa-chevron-right text-[9px]"></i>
+                            </span>
+                        </div>
+                    `;
+                    foodGrid.appendChild(card);
+                });
+            }
+        }
+
+        function updateProgressStats() {
+            const totalDishes = FOOD_DATA.length;
+            const globalEaten = checkedDishes.length;
+            const globalPercent = totalDishes > 0 ? Math.round((globalEaten / totalDishes) * 100) : 0;
+
+            document.getElementById('global-progress-text').innerText = `${globalEaten}/${totalDishes} probados (${globalPercent}%)`;
+            document.getElementById('global-progress-bar').style.width = `${globalPercent}%`;
+
+            const categoryDishes = currentCategory === 'all' 
+                ? FOOD_DATA 
+                : FOOD_DATA.filter(d => d.category === currentCategory);
+            
+            const catTotal = categoryDishes.length;
+            const catEaten = categoryDishes.filter(d => checkedDishes.includes(d.id)).length;
+
+            document.getElementById('category-progress-text').innerText = `${catEaten} de ${catTotal} completados`;
+            document.getElementById('category-progress-bar').style.width = `${catTotal > 0 ? (catEaten / catTotal) * 100 : 0}%`;
+        }
+
+        // Modal Handlers
+        function openModal(dishId) {
+            const dish = FOOD_DATA.find(d => d.id === dishId);
+            if (!dish) return;
+
+            activeModalDishId = dishId;
+
+            document.getElementById('modal-img').src = dish.img;
+            document.getElementById('modal-emoji').innerText = dish.emoji;
+            document.getElementById('modal-title').innerText = dish.name;
+            document.getElementById('modal-kanji').innerText = dish.kanji;
+            document.getElementById('modal-romaji').innerText = dish.romaji;
+            document.getElementById('modal-region').innerText = dish.regionName;
+            document.getElementById('modal-budget').innerText = dish.budget;
+            document.getElementById('modal-desc').innerText = dish.desc;
+            document.getElementById('modal-spot').innerText = dish.spot;
+
+            document.getElementById('modal-phrase-jp').innerText = dish.phraseJp;
+            document.getElementById('modal-phrase-romaji').innerText = `"${dish.phraseRomaji}"`;
+            document.getElementById('modal-phrase-es').innerText = `Traducción: "${dish.phraseEs}"`;
+
+            // Dynamic Google Images link
+            const searchQuery = encodeURIComponent(`${dish.name} ${dish.kanji} comida japon`);
+            document.getElementById('modal-google-link').href = `https://www.google.com/search?tbm=isch&q=${searchQuery}`;
+
+            updateModalCheckButton();
+
+            dishModal.classList.remove('hidden');
+            dishModal.classList.add('flex');
+        }
+
+        function closeModal() {
+            activeModalDishId = null;
+            dishModal.classList.add('hidden');
+            dishModal.classList.remove('flex');
+        }
+
+        function updateModalCheckButton() {
+            const btn = document.getElementById('modal-check-btn');
+            const isChecked = checkedDishes.includes(activeModalDishId);
+
+            if (isChecked) {
+                btn.className = 'w-full py-2.5 rounded-xl font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition shadow-sm bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800';
+                btn.innerHTML = '<i class="fa-solid fa-circle-check text-base"></i> ¡Plato Probado! (Toca para desmarcar)';
+            } else {
+                btn.className = 'w-full py-2.5 rounded-xl font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition shadow-sm bg-sakura-600 text-white hover:bg-sakura-500';
+                btn.innerHTML = '<i class="fa-regular fa-circle text-base"></i> Marcar como Probado';
+            }
+        }
+
+        function toggleModalCheck() {
+            if (activeModalDishId) {
+                toggleCheck(activeModalDishId);
+            }
+        }
+
+        // Copy Phrase to Clipboard
+        function copyOrderingPhrase() {
+            const jpText = document.getElementById('modal-phrase-jp').innerText;
+            
+            const tempInput = document.createElement('textarea');
+            tempInput.value = jpText;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+
+            const copyBtnText = document.getElementById('copy-btn-text');
+            copyBtnText.innerText = '¡Copiado!';
+            setTimeout(() => {
+                copyBtnText.innerText = 'Copiar';
+            }, 2000);
+
+            showToast('Frase copiada al portapapeles', 'success');
+        }
+
+        // Toast Notification System
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toast-message');
+            const toastIcon = document.getElementById('toast-icon');
+
+            toastMessage.innerText = message;
+            
+            if (type === 'success') {
+                toastIcon.className = 'fa-solid fa-circle-check text-emerald-400';
+            } else {
+                toastIcon.className = 'fa-solid fa-circle-info text-sky-400';
+            }
+
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 2500);
+        }
+
+        // Close modal on click outside
+        dishModal.addEventListener('click', (e) => {
+            if (e.target === dishModal) closeModal();
+        });
+    </script>
+</body>
+</html>
